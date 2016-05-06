@@ -17,8 +17,6 @@ def getData(filename):
 dataset,label,obj=getData('train.xlsx')
 u=getUniqueVals(np.array(dataset),label)
 myTree,rankTree=createTree(dataset,label,u)
-print pd.Panel(rankTree).to_frame()
-exit()
 createPlot(rankTree)
  #createPlot(myTree)
 

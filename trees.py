@@ -83,7 +83,7 @@ def Rank(rankTree):
     else: classLabel = valueOfFeat
     return classLabel
 
-def createTree(dataSet,labels,ValsSet,node='root',dictIndex=[]):
+def createTree(dataSet,labels,ValsSet,node='root'):
     classList = [example[-1] for example in dataSet]
     if classList.count(classList[0]) == len(classList):
         return findClass(classList)
@@ -100,7 +100,6 @@ def createTree(dataSet,labels,ValsSet,node='root',dictIndex=[]):
     rankTree={bestFeatLabel:{}}
     del(labels[bestFeat])
     #print bestFeat
-    dictIndex.append(bestFeatLabel)
     featValues = [example[bestFeat] for example in dataSet]
     #print featValues
     uniqueVals = set(featValues)
@@ -108,8 +107,6 @@ def createTree(dataSet,labels,ValsSet,node='root',dictIndex=[]):
        # some value have no example
        for val in ValsSet[bestFeatLabel]:
            if val not in uniqueVals:
-               dictIndex_copy=dictIndex
-               dictIndex_copy.append(val)
                l,votes=findClass(classList)
                myTree[bestFeatLabel][val]=l
                rankTree[bestFeatLabel][val]=str([0,0,votes[-1]])
