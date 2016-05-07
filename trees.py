@@ -28,7 +28,7 @@ def splitDataSet(dataSet, axis, value):
 def chooseBestFeatureToSplit(dataSet,labels):
     numFeatures = len(dataSet[0]) - 1      #the last column is used for the labels
     baseEntropy = entropy(dataSet)
-    bestInfoGain = 0.0; bestFeature = -1
+    bestInfoGain = 0.0; bestFeature = 0
     for i in range(numFeatures):        #iterate over all the features
         featList = [example[i] for example in dataSet]#create a list of all the examples of this feature
         uniqueVals = set(featList)       #get a set of unique values
@@ -64,6 +64,12 @@ def findClass(classList):
             clas=vote
     return clas,[classCount['Yes'],classCount['No'],(classCount['Yes']+1.0)/(classCount['Yes']+classCount['No']+2)]
 
+def sortRankingTree(rankingTree,rank):
+    pass
+
+def rankingTree2string(rankingTree):
+    pass
+
 def getUniqueVals(dataSet,labels):
     uniqueVals=dict()
     i=0
@@ -84,15 +90,16 @@ def Rank(rankTree):
     return classLabel
 
 def createTree(dataSet,labels,ValsSet,node='root'):
+    #check impurity and if we've run out of features
     classList = [example[-1] for example in dataSet]
-    if classList.count(classList[0]) == len(classList):
+    if classList.count(classList[0]) == len(classList) or len(dataSet[0])==1:
         return findClass(classList)
     print '================================================================'
     print node
     print '----------------------------------------------------------------'
     bestFeat,bestInfoGain = chooseBestFeatureToSplit(dataSet,labels)
-    if bestInfoGain==0:
-        return findClass(classList)
+    #if bestInfoGain==0:
+    #    return findClass(classList)
     bestFeatLabel = labels[bestFeat]
     print 'I choose',bestFeatLabel
     node+='->'+bestFeatLabel+'='
