@@ -3,6 +3,7 @@ from treePlotter import *
 import numpy as np
 import pandas as pd
 
+rank=[]
 
 def getData(filename):
     raw_train=pd.read_excel(filename,index_col=0)
@@ -16,8 +17,13 @@ def getData(filename):
     return dataset,label,obj
 dataset,label,obj=getData('train.xlsx')
 u=getUniqueVals(np.array(dataset),label)
-myTree,rankTree=createTree(dataset,label,u)
+myTree,rankTree=createTree(dataset,label,u,rank=rank)
+rank=sortRankingTree(rankTree,rank)
+Rank(rankTree,rank)
+print rank
+rankingTree2string(rankTree)
 createPlot(rankTree)
+exit()
  #createPlot(myTree)
 
 for i in range(3):

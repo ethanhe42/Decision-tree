@@ -2,6 +2,7 @@ from math import log
 import operator
 import numpy as np
 
+leavesCnt=0
 def entropy(dataSet):
     numEntries = len(dataSet)
     labelCounts = {}
@@ -50,7 +51,8 @@ def chooseBestFeatureToSplit(dataSet,labels):
     return bestFeature,bestInfoGain
     #returns an integer
 
-def findClass(classList):
+def findClass(classList,rank):
+    global leavesCnt
     classCount={}
     for i in ['Yes','No']:
         classCount[i]=0
@@ -62,13 +64,57 @@ def findClass(classList):
     for vote in classList:
         if classCount[vote]>classCount[clas]:
             clas=vote
-    return clas,[classCount['Yes'],classCount['No'],(classCount['Yes']+1.0)/(classCount['Yes']+classCount['No']+2)]
+    infos=[classCount['Yes'],classCount['No'],(classCount['Yes']+1.0)/(classCount['Yes']+classCount['No']+2),leavesCnt]
+    leavesCnt+=1
+    rank.append(infos)
+    return clas,infos
 
 def sortRankingTree(rankingTree,rank):
+    sorted_rank=np.array(rank).T[-2:]
+    idx=(-sorted_rank[0]).argsort()
+    sorted_idx=sorted_rank[1][idx]
+    #print sorted_idx
+    sorted_prob=sorted_rank[0][idx]
+    #print sorted_prob
+    new_ranks=[1]
+    for i in range(len(sorted_prob[1:])):
+        if sorted_prob[i+1]==sorted_prob[i]:
+            new_ranks.append(new_ranks[-1])
+        else:
+            new_ranks.append(new_ranks[-1]+1)
+    #print new_ranks
+    ret_idx=sorted_idx.argsort().astype(int)
+    ret_ranks=np.array(new_ranks)[ret_idx]
+    return ret_ranks
+
+def traverseLeaves(rankingTree,func):
     pass
 
-def rankingTree2string(rankingTree):
-    pass
+
+
+def rankingTree2string(rankTree):
+    firstStr = rankTree.keys()[0]
+    secondDict = rankTree[firstStr]
+    for valueOfFeat  in secondDict:
+        item=secondDict[valueOfFeat]
+        if isinstance(item, dict):
+            rankingTree2string(item)
+        else: 
+            string=str(item[:2])+'\n'
+            string+="{:2.1f}".format(item[-2]*100.0)+'%\n'
+            string+='rank'+str(item[-1])
+            secondDict[valueOfFeat]=string
+
+
+def Rank(rankTree,rank):
+    firstStr = rankTree.keys()[0]
+    secondDict = rankTree[firstStr]
+    for valueOfFeat  in secondDict:
+        item=secondDict[valueOfFeat]
+        if isinstance(item, dict):
+            Rank(item,rank)
+        else: 
+            secondDict[valueOfFeat][-1]=rank[item[-1]]
 
 def getUniqueVals(dataSet,labels):
     uniqueVals=dict()
@@ -78,28 +124,17 @@ def getUniqueVals(dataSet,labels):
         i+=1
     return uniqueVals
 
-def Rank(rankTree):
-    firstStr = rankTree.keys()[0]
-    secondDict = rankTree[firstStr]
-    featIndex = featLabels.index(firstStr)
-    key = testVec[featIndex]
-    valueOfFeat = secondDict[key]
-    if isinstance(valueOfFeat, dict):
-        classLabel = classify(valueOfFeat, featLabels, testVec)
-    else: classLabel = valueOfFeat
-    return classLabel
-
-def createTree(dataSet,labels,ValsSet,node='root'):
+def createTree(dataSet,labels,ValsSet,node='root',rank=None):
     #check impurity and if we've run out of features
     classList = [example[-1] for example in dataSet]
     if classList.count(classList[0]) == len(classList) or len(dataSet[0])==1:
-        return findClass(classList)
+        return findClass(classList,rank)
     print '================================================================'
     print node
     print '----------------------------------------------------------------'
     bestFeat,bestInfoGain = chooseBestFeatureToSplit(dataSet,labels)
     #if bestInfoGain==0:
-    #    return findClass(classList)
+    #    return findClass(classList,rank)
     bestFeatLabel = labels[bestFeat]
     print 'I choose',bestFeatLabel
     node+='->'+bestFeatLabel+'='
@@ -114,15 +149,15 @@ def createTree(dataSet,labels,ValsSet,node='root'):
        # some value have no example
        for val in ValsSet[bestFeatLabel]:
            if val not in uniqueVals:
-               l,votes=findClass(classList)
+               l,votes=findClass(classList,rank)
                myTree[bestFeatLabel][val]=l
-               rankTree[bestFeatLabel][val]=str([0,0,votes[-1]])
+               rankTree[bestFeatLabel][val]=[0,0,.5,votes[-1]]
             
     for value in uniqueVals:
         #print value
         subLabels = labels[:]       #copy all of labels, so trees don't mess up existing labels
         myTree[bestFeatLabel][value],rankTree[bestFeatLabel][value]\
-                = createTree(splitDataSet(dataSet, bestFeat, value),subLabels,ValsSet,node=node+value)
+                = createTree(splitDataSet(dataSet, bestFeat, value),subLabels,ValsSet,node=node+value,rank=rank)
     return myTree,rankTree #also return a ranking tree
 
 def classify(inputTree,featLabels,testVec):
