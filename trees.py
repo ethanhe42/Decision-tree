@@ -87,11 +87,6 @@ def sortRankingTree(rankingTree,rank):
     ret_ranks=np.array(new_ranks)[ret_idx]
     return ret_ranks
 
-def traverseLeaves(rankingTree,func):
-    pass
-
-
-
 def rankingTree2string(rankTree):
     firstStr = rankTree.keys()[0]
     secondDict = rankTree[firstStr]
@@ -160,15 +155,19 @@ def createTree(dataSet,labels,ValsSet,node='root',rank=None):
                 = createTree(splitDataSet(dataSet, bestFeat, value),subLabels,ValsSet,node=node+value,rank=rank)
     return myTree,rankTree #also return a ranking tree
 
-def classify(inputTree,featLabels,testVec):
+def classify(inputTree,featLabels,testVec,ranking=False):
     firstStr = inputTree.keys()[0]
     secondDict = inputTree[firstStr]
     featIndex = featLabels.index(firstStr)
     key = testVec[featIndex]
     valueOfFeat = secondDict[key]
     if isinstance(valueOfFeat, dict):
-        classLabel = classify(valueOfFeat, featLabels, testVec)
-    else: classLabel = valueOfFeat
+        classLabel = classify(valueOfFeat, featLabels, testVec,ranking)
+    else: 
+        if ranking==False:
+            classLabel=valueOfFeat
+        else:
+            classLabel=valueOfFeat[-1]
     return classLabel
 
 
