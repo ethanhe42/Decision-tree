@@ -5,10 +5,10 @@ Created on Oct 14, 2010
 '''
 import matplotlib.pyplot as plt
 
-decisionNode = dict(boxstyle="sawtooth", fc="0.8")
-leafNode = dict(boxstyle="round4", fc="0.8")
+decisionNode = dict(boxstyle="sawtooth", fc="0.8",alpha=.5)
+leafNode = dict(boxstyle="round4", fc="#ee8d18",alpha=.5)
 arrow_args = dict(arrowstyle="<-")
-
+#style.use('ggplot')
 def getNumLeafs(myTree):
     numLeafs = 0
     firstStr = myTree.keys()[0]
@@ -69,5 +69,6 @@ def createPlot(inTree):
     plotTree.totalD = float(getTreeDepth(inTree))
     plotTree.xOff = -0.5/plotTree.totalW; plotTree.yOff = 1.0;
     plotTree(inTree, (0.5,1.0), '')
+    plt.savefig('output.eps')
     plt.show()
 

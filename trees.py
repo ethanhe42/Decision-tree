@@ -6,9 +6,10 @@ leavesCnt=0
 def entropy(dataSet):
     numEntries = len(dataSet)
     labelCounts = {}
-    for featVec in dataSet: #the the number of unique elements and their occurance
+    for featVec in dataSet: 
         currentLabel = featVec[-1]
-        if currentLabel not in labelCounts.keys(): labelCounts[currentLabel] = 0
+        if currentLabel not in labelCounts.keys(): 
+            labelCounts[currentLabel] = 0
         labelCounts[currentLabel] += 1
     ent = 0.0
     for key in labelCounts:
@@ -21,18 +22,22 @@ def splitDataSet(dataSet, axis, value):
     retDataSet = []
     for featVec in dataSet:
         if featVec[axis] == value:
-            reducedFeatVec = featVec[:axis]     #chop out axis used for splitting
+            reducedFeatVec = featVec[:axis]
             reducedFeatVec.extend(featVec[axis+1:])
             retDataSet.append(reducedFeatVec)
     return retDataSet
 
 def chooseBestFeatureToSplit(dataSet,labels):
-    numFeatures = len(dataSet[0]) - 1      #the last column is used for the labels
+    numFeatures = len(dataSet[0]) - 1     
+    #the last column is used for the labels
     baseEntropy = entropy(dataSet)
     bestInfoGain = 0.0; bestFeature = 0
-    for i in range(numFeatures):        #iterate over all the features
-        featList = [example[i] for example in dataSet]#create a list of all the examples of this feature
-        uniqueVals = set(featList)       #get a set of unique values
+    for i in range(numFeatures):       
+        #iterate over all the features
+        featList = [example[i] for example in dataSet]
+        #create a list of all the examples of this feature
+        uniqueVals = set(featList)      
+        #get a set of unique values
         newEntropy = 0.0
         print labels[i],'impurity'
         for value in uniqueVals:
@@ -42,11 +47,13 @@ def chooseBestFeatureToSplit(dataSet,labels):
             sub_ent=entropy(subDataSet)
             print value,sub_ent
             newEntropy +=prob*sub_ent
-        infoGain = baseEntropy - newEntropy     #calculate the info gain; ie reduction in entropy
+        infoGain = baseEntropy - newEntropy   
         print 'information Gain',infoGain
         print 'Total impurity', newEntropy,'\n'
-        if (infoGain > bestInfoGain):       #compare this to the best gain so far
-            bestInfoGain = infoGain         #if better than current best, set to best
+        if (infoGain > bestInfoGain):      
+            #compare this to the best gain so far
+            bestInfoGain = infoGain       
+            #if better than current best, set to best
             bestFeature = i
     return bestFeature,bestInfoGain
     #returns an integer
@@ -64,7 +71,9 @@ def findClass(classList,rank):
     for vote in classList:
         if classCount[vote]>classCount[clas]:
             clas=vote
-    infos=[classCount['Yes'],classCount['No'],(classCount['Yes']+1.0)/(classCount['Yes']+classCount['No']+2),leavesCnt]
+    infos=[classCount['Yes'],classCount['No'],\
+            (classCount['Yes']+1.0)/(classCount['Yes']+classCount['No']+2),\
+            leavesCnt]
     leavesCnt+=1
     rank.append(infos)
     return clas,infos
@@ -150,9 +159,10 @@ def createTree(dataSet,labels,ValsSet,node='root',rank=None):
             
     for value in uniqueVals:
         #print value
-        subLabels = labels[:]       #copy all of labels, so trees don't mess up existing labels
+        subLabels = labels[:]       
         myTree[bestFeatLabel][value],rankTree[bestFeatLabel][value]\
-                = createTree(splitDataSet(dataSet, bestFeat, value),subLabels,ValsSet,node=node+value,rank=rank)
+                = createTree(splitDataSet(dataSet, bestFeat, value),
+                        subLabels,ValsSet,node=node+value,rank=rank)
     return myTree,rankTree #also return a ranking tree
 
 def classify(inputTree,featLabels,testVec,ranking=False):

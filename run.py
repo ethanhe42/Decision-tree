@@ -2,9 +2,10 @@ from trees import *
 from treePlotter import *
 import numpy as np
 import pandas as pd
-
+import sys
+sys.stdout = open("decision.txt", "w")
 rank=[]
-
+decision=True
 def getData(filename):
     raw_train=pd.read_excel(filename,index_col=0)
 
@@ -23,6 +24,7 @@ Rank(rankTree,rank)
 #print rank
 
 def DTmetric(myTree=myTree):
+    sys.stdout = open("classify.txt", "w")
     for i in range(3):
         name='HW3 - Test data set '+str(i)+'.xlsx'
         if i==0:
@@ -46,6 +48,7 @@ def DTmetric(myTree=myTree):
     
     
 def RTmetric(rankTree=rankTree):
+    sys.stdout = open("ranking.txt", "w")
     for i in range(3):
         name='HW3 - Test data set '+str(i)+'.xlsx'
         if i==0:
@@ -82,7 +85,10 @@ def RTmetric(rankTree=rankTree):
         print 'accuracy',1-err_rate,'\n'
 
 print '\n'
-RTmetric(rankTree)
-rankingTree2string(rankTree)
-#createPlot(rankTree)
- #createPlot(myTree)
+if decision==False:
+    RTmetric(rankTree)
+    rankingTree2string(rankTree)
+    createPlot(rankTree)
+else:
+    DTmetric(myTree)
+    createPlot(myTree)
