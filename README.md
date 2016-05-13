@@ -1,8 +1,6 @@
 # decision tree.
-- [ ] give priority to Yes
+![img](figure_2.png)  
+- [x] give priority to Yes
 - [x] give priority to first feature
 - [x] entropy
-- [ ] Show how each node is decided 
-
-
-# Decision-tree
+- [x] Show how each node is decided 
